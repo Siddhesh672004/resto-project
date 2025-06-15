@@ -1,11 +1,16 @@
 <template>
+    <HeaderPage />
     <h1>Hello User, Welcome on Home Page</h1>
 
 </template>
 
 <script>
+import HeaderPage from './HeaderPage.vue';
 export default {
     name: 'HomePage',
+    components:{
+        HeaderPage
+    },
     mounted() {
         let user = localStorage.getItem('user-info');
         if (!user) {
