@@ -1,6 +1,6 @@
 <template>
     <HeaderPage />
-    <h1>Hello {{name}}, Welcome on Home Page</h1>
+    <h1>Hello {{ name }}, Welcome on Home Page</h1>
 
     <table border="1">
         <tr>
@@ -15,7 +15,10 @@
             <td>{{ item.name }}</td>
             <td>{{ item.contact }}</td>
             <td>{{ item.address }}</td>
-            <td> <router-link :to="'/update-resto/' + item.id">Update</router-link> </td>
+            <td>
+                <router-link :to="'/update-resto/' + item.id">Update</router-link>
+                <button v-on:click="deleteRestaurant(item.id)">Delete</button>
+            </td>
         </tr>
     </table>
 
@@ -26,33 +29,45 @@ import HeaderPage from './HeaderPage.vue';
 import axios from 'axios';
 export default {
     name: 'HomePage',
-    data(){
+    data() {
         return {
-            name:'',
+            name: '',
             restaurant: [],
         }
     },
-    components:{
+    components: {
         HeaderPage
     },
+    methods: {
+        async deleteRestaurant(id) {
+            let result = await axios.delete("http://localhost:3000/restaurant/" + id);
+            console.warn(result);
+            if (result.status == 200) {
+                this.loadData()
+            }
+        },
+        async loadData() {
+            let user = localStorage.getItem('user-info');
+            this.name = JSON.parse(user).name;
+            if (!user) {
+                this.$router.push({ name: 'SignUp' })
+            }
+
+            let result = await axios.get("http://localhost:3000/restaurant");
+            console.warn(result);
+            this.restaurant = result.data;
+        },
+    },
+
     async mounted() {
-        let user = localStorage.getItem('user-info');
-        this.name = JSON.parse(user).name;
-        if (!user) {
-            this.$router.push({ name: 'SignUp' })
-        }
-
-        let result = await axios.get("http://localhost:3000/restaurant");
-        console.warn(result);
-        this.restaurant = result.data;
+        this.loadData();
     }
-
 }
 </script>
 
 <style>
-    td{
-        width: 160px;
-        height: 40px;
-    }
+td {
+    width: 160px;
+    height: 40px;
+}
 </style>
